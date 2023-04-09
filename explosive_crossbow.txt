@@ -1,0 +1,39 @@
+@name Explosive Crossbow by zwk
+@persist Bolts:array Count
+
+interval(30)
+if(first()) {
+    Rangers = array()     
+}
+findByClass("crossbow_bolt")
+findExcludePlayerProps("*")
+findIncludePlayerProps(owner())
+Bolts = findToArray()
+Count = Bolts:count()
+
+if(changed(Count) & !first() & $Count == 1){
+    owner():soundPlay(1,0,"npc/combine_gunship/attack_start2.wav")
+}
+
+
+
+for(I=0, Count) {
+rangerFilter(Bolts[I, entity])
+rangerFilter(owner())
+    
+    if(changed(Count)) {
+    Bolts[Count, entity]:setTrails(1000, 1, 1 , "trails/laser", vec(100, 255, 100), 255, 0, 0)   
+    }
+    
+    if(Bolts[I,entity]:isValid()) { 
+        Rangers[I, ranger] = rangerOffset(150,Bolts[I,entity]:pos(),Bolts[I,entity]:forward())
+    }
+    if(changed(Rangers[I, ranger]:hit())& Rangers[I, ranger]:hit()) {
+        if(Rangers[I, ranger]:entity():isPlayer()) {
+            hint("Crossbow hit: "+Rangers[I, ranger]:entity():name(), 10)   
+        }
+        Explosion = propSpawn("models/props_phx/mk-82.mdl",Rangers[I, ranger]:pos(),1)
+        Explosion:propBreak()
+        
+    }   
+}
